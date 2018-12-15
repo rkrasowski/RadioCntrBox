@@ -2,6 +2,21 @@
 use strict;
 use warnings;
 
+######################### radioController.pl ############################
+#									#
+#		Controll Flex Radio, Rotator, Ant switch		#
+#									#
+#########################################################################
+
+
+
+# RAspberry Pi GPIO Pins:
+# Up   		-> 0
+# OK   		-> 2
+# Down 		-> 3
+# Flex ON/OFF 	-> 5
+# Rotator CW	-> 1
+# Rotator CCW	-> 4
 
 my $buttonUp = 0;
 my $buttonDown = 0;
@@ -11,13 +26,17 @@ my $line2;
 my $line3;
 my $line4;
 
-my $initialDelay = 20;
+my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
 
+my $initialDelay = 20;
 my $unixFinish = time + $initialDelay;
 
 
+# Resets pins in Raspberry Pi
+
 `gpio mode 1 out`;
 `gpio mode 4 out`;
+`gpio mode 5 out`;
 `gpio mode 0 in`;
 `gpio mode 2 in`;
 `gpio mode 3 in`;
@@ -25,6 +44,7 @@ my $unixFinish = time + $initialDelay;
 
 `gpio write 1 1`;
 `gpio write 4 1`;
+`gpio write 5 1`;
 
 # Display IP
 
@@ -72,27 +92,23 @@ while(1)
 
 		my $time = "$date[4] $date[3]";
              
-$date[5] = substr( $date[5],0,4);
+		$date[5] = substr( $date[5],0,4);
 
 		$date = "$date[0] $date[1] $date[2] $date[5]";
 
 		$line1= "Time and date";
 		$line2 = "$time";
 		$line3 = "$date";
-		$line4 = "OK?";
+		$line4 = "OK for Menu";
 
 		`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
 		sleep(1);
 
 		$buttonOk = `gpio read 2`;
 		if ($buttonOk == 1)
                         {
-
                                 goto MENU;
-
                         }
-
 	}
 		
 
@@ -100,9 +116,9 @@ $date[5] = substr( $date[5],0,4);
 MENU:
 
                 $line1= "Functions:";
-                $line2 = "Rotator <--";
-                $line3 = "Ant Switch";
-                $line4 = "Return";
+                $line2 = "Radio ON/OFF <--";
+                $line3 = "Rotator";
+                $line4 = "Antenna Switch";
 
                 `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
@@ -124,14 +140,90 @@ MENU:
 				if ($buttonOk == 1)
 					{
 					
-						goto MENUCW;
+						goto FLEXONOFF;
 					}
 
 				if ($buttonDown == 1)
 					{
-						goto MENUANTSWITCH;
+						goto MENUCW;
 					} 
 			}
+
+
+
+FLEXONOFF:
+
+		if ($flexONOFF == 0)
+			{
+			
+  				$line1= "FLEX is OFF";
+                		$line2 = "Turn it ON?";
+                		$line3 = "OK?";
+                		$line4 = "DOWN to  Exit";
+
+                		`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+                		sleep(1);
+
+                		while(1)
+                        		{
+                                		$buttonUp = `gpio read 0`;
+                                		$buttonOk = `gpio read 2`;
+                                		$buttonDown = `gpio read 3`;
+
+		                                if ($buttonOk == 1)
+                		                        {
+								$flexONOFF = 1;
+								`gpio write 5 0`;
+        		                                        goto MENU;
+                        		                }
+
+                                		if ($buttonDown == 1)
+                                        		{
+                                                		goto MENU;
+                                        		}
+                        		}
+			}
+
+
+
+
+ 		if ($flexONOFF == 1)
+                        {
+
+                                $line1= "FLEX is ON";
+                                $line2 = "Turn it OFF?";
+                                $line3 = "OK?";
+                                $line4 = "DOWN to  Exit";
+
+                                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+                                sleep(1);
+
+                                while(1)
+                                        {
+                                                $buttonUp = `gpio read 0`;
+                                                $buttonOk = `gpio read 2`;
+                                                $buttonDown = `gpio read 3`;
+
+                                                if ($buttonOk == 1)
+                                                        {
+
+                                                                $flexONOFF = 0;
+								`gpio write 5 1`;
+                                                                goto MENU;
+                                                        }
+
+                                                if ($buttonDown == 1)
+                                                        {
+                                                                goto MENU;
+                                                        }
+                                        }
+                        }
+
+
+
+
 
 MENUCW:
 
