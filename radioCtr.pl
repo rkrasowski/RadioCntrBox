@@ -71,6 +71,8 @@ while(1)
 		my @date = split (/ /,$date);
 
 		my $time = "$date[4] $date[3]";
+             
+$date[5] = substr( $date[5],0,4);
 
 		$date = "$date[0] $date[1] $date[2] $date[5]";
 
