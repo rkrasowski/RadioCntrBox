@@ -235,10 +235,13 @@ FLEXONOFF:
 
 
 MENUCW:
+		$azimuth = `python azimuth.py`;
+                $azimuth = $azimuth / 50.8;
+                $azimuth = sprintf ("%d", $azimuth);
 
-                $line1= "ANT Azimuth: 234";
-                $line2 = "Turn CW <--";
-                $line3 = "Turn CCW";
+                $line1= "ANT Azimuth: $azimuth";
+                $line2 = "Turn CCW <--";
+                $line3 = "Turn CW";
                 $line4 = "RETURN";
 
                 `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
@@ -269,9 +272,13 @@ MENUCW:
 
 MENUCCW:
 
- 		$line1= "Ant Azimuth:  234";
-                $line2 = "Turn CW ";
-                $line3 = "Turn CCW <--";
+		$azimuth = `python azimuth.py`;
+                $azimuth = $azimuth / 50.8;
+                $azimuth = sprintf ("%d", $azimuth);
+
+ 		$line1= "Ant Azimuth: $azimuth";
+                $line2 = "Turn CCW ";
+                $line3 = "Turn CW <--";
                 $line4 = "RETURN";
 
                 `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
@@ -307,7 +314,13 @@ MENUCCW:
 
 CCW:
 
-		$line1= "Ant Azimut:234";
+
+ 		$azimuth = `python azimuth.py`;
+                $azimuth = $azimuth / 50.8;
+                $azimuth = sprintf ("%d", $azimuth);
+
+
+		$line1= "Ant Azimuth: $azimuth";
                 $line2 = "Turning CCW";
                 $line3 = ".";
                 $line4 = "OK to STOP?";
@@ -318,7 +331,12 @@ CCW:
 		
                 while(1)
                         {
-                   		$line1= "Ant Azimut:234";
+				$azimuth = `python azimuth.py`;
+				$azimuth = $azimuth / 50.8;
+				$azimuth = sprintf ("%d", $azimuth);
+                   		
+
+				$line1= "Ant Azimuth: $azimuth";
                                 $line3 = "..";
                                 `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
@@ -353,8 +371,12 @@ CCW:
 
 CW:
 
-                $line1= "Ant Azimut:234";
-                $line2 = "Turning CW";
+ 		$azimuth = `python azimuth.py`;
+                $azimuth = $azimuth / 50.8;
+                $azimuth = sprintf ("%d", $azimuth);
+                
+		$line1= "Ant Azimut: $azimuth";
+                $line2 = "Turning CCW";
                 $line3 = ".";
                 $line4 = "OK to STOP?";
 
@@ -366,7 +388,13 @@ CW:
                         {
                                 
 
-				$line1= "Ant Azimut:234";
+				$azimuth = `python azimuth.py`;
+                                $azimuth = $azimuth / 50.8;
+                                $azimuth = sprintf ("%d", $azimuth);
+
+
+                                $line1= "Ant Azimut: $azimuth";
+
 				$line3 = "..";
 				`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
