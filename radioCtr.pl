@@ -26,9 +26,13 @@ my $line2;
 my $line3;
 my $line4;
 
-my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
 
-my $initialDelay = 20;
+
+my $file = "/home/pi/HamRadio/RadioCntrBox/temp.txt";
+my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
+my $azimuth = 0;
+
+my $initialDelay = 2;
 my $unixFinish = time + $initialDelay;
 
 
@@ -46,6 +50,11 @@ my $unixFinish = time + $initialDelay;
 `gpio write 4 1`;
 `gpio write 5 1`;
 
+
+# Reset temp.txt file  - current data
+
+writeFile(0,120);
+
 # Display IP
 
 my $ip = `ip address list | grep inet | grep -v 127.0.0 | cut -d " " -f 6 | cut -d "/" -f 1`;
@@ -61,7 +70,6 @@ $line4 = "OK?";
 
 
 `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
 
 
 while(1)
@@ -153,6 +161,8 @@ MENU:
 
 FLEXONOFF:
 
+		readFile();
+
 		if ($flexONOFF == 0)
 			{
 			
@@ -173,7 +183,7 @@ FLEXONOFF:
 
 		                                if ($buttonOk == 1)
                 		                        {
-								$flexONOFF = 1;
+								writeFile(1,$azimuth);
 								`gpio write 5 0`;
         		                                        goto MENU;
                         		                }
@@ -208,8 +218,7 @@ FLEXONOFF:
 
                                                 if ($buttonOk == 1)
                                                         {
-
-                                                                $flexONOFF = 0;
+								writeFile(0,$azimuth);
 								`gpio write 5 1`;
                                                                 goto MENU;
                                                         }
@@ -478,9 +487,39 @@ RETURN:
 
 
 
+############################ Subroutines ################################################
 
 
 
+sub readFile
+        {
 
-sleep(1);
+                open( my $fh, '<', $file ) or die "Can't open $file: $!";
+
+                my $data;
+                my $line;
+                while (my $line = <$fh>)
+                        {
+                                $data .=$line;
+                        }
+
+                my @line = split(/ /,$data);
+                $flexONOFF = $line[0];
+                $azimuth = $line[1];
+                close $fh;
+
+        }
+
+sub writeFile
+
+        {
+                my $flexONOFFWrite = shift;
+                my $azimuthWrite = shift;
+                open( my $fh, '>', $file ) or die "Can't open $file: $!";
+                print $fh "$flexONOFFWrite $azimuthWrite";
+                close $fh;
+        }
+
+
+
 
