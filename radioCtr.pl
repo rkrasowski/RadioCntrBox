@@ -51,6 +51,9 @@ my $unixFinish = time + $initialDelay;
 `gpio write 5 1`;
 
 
+sleep(20);
+
+
 # Reset temp.txt file  - current data
 
 writeFile(0,120);
@@ -69,7 +72,7 @@ $line3 = "";
 $line4 = "OK?";
 
 
-`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 
 while(1)
@@ -109,7 +112,7 @@ while(1)
 		$line3 = "$date";
 		$line4 = "OK for Menu";
 
-		`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+		`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 		sleep(1);
 
 		$buttonOk = `gpio read 2`;
@@ -128,7 +131,7 @@ MENU:
                 $line3 = "Rotator";
                 $line4 = "Antenna Switch";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 		sleep(1);
 		
@@ -171,7 +174,7 @@ FLEXONOFF:
                 		$line3 = "OK?";
                 		$line4 = "DOWN to  Exit";
 
-                		`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                		`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
                 		sleep(1);
 
@@ -206,7 +209,7 @@ FLEXONOFF:
                                 $line3 = "OK?";
                                 $line4 = "DOWN to  Exit";
 
-                                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 
                                 sleep(1);
 
@@ -244,7 +247,7 @@ MENUCW:
                 $line3 = "Turn CW";
                 $line4 = "RETURN";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		sleep(1);
 
 		while(1)
@@ -281,7 +284,7 @@ MENUCCW:
                 $line3 = "Turn CW <--";
                 $line4 = "RETURN";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		sleep(1);
 		
 		while(1)
@@ -325,7 +328,7 @@ CCW:
                 $line3 = ".";
                 $line4 = "OK to STOP?";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		`gpio write 1 0`;
                 sleep(1);
 		
@@ -338,7 +341,7 @@ CCW:
 
 				$line1= "Ant Azimuth: $azimuth";
                                 $line3 = "..";
-                                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 		
 			        $buttonUp = `gpio read 0`;
@@ -380,7 +383,7 @@ CW:
                 $line3 = ".";
                 $line4 = "OK to STOP?";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		`gpio write 4 0`;
                 sleep(1);
 
@@ -396,7 +399,7 @@ CW:
                                 $line1= "Ant Azimut: $azimuth";
 
 				$line3 = "..";
-				`python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+				`python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 
 
 
@@ -438,7 +441,7 @@ MENUANTSWITCH:
                 $line3 = "Ant Switch <--";
                 $line4 = "Return";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 
                 sleep(1);
 
@@ -484,7 +487,7 @@ RETURN:
                 $line3 = "and Date";
                 $line4 = "OK?";
 
-                `python lcd.py "$line1" "$line2" "$line3" "$line4"`;
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 
                 sleep(1);
 
