@@ -30,7 +30,7 @@ my $line4;
 
 my $file = "/home/pi/HamRadio/RadioCntrBox/temp.txt";
 my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
-my $azimuth = 0;
+my $azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
 
 my $initialDelay = 2;
 my $unixFinish = time + $initialDelay;
@@ -101,11 +101,11 @@ while(1)
 		my $date = `date`;
 		my @date = split (/ /,$date);
 
-		my $time = "$date[4] $date[3]";
+		my $time = "$date[4] $date[5]";
              
-		$date[5] = substr( $date[5],0,4);
+		$date[6] = substr( $date[6],0,4);
 
-		$date = "$date[0] $date[1] $date[2] $date[5]";
+		$date = "$date[0] $date[1] $date[3] $date[6]";
 
 		$line1= "Time and date";
 		$line2 = "$time";
@@ -238,7 +238,7 @@ FLEXONOFF:
 
 
 MENUCW:
-		$azimuth = `python azimuth.py`;
+		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
                 $azimuth = sprintf ("%d", $azimuth);
 
@@ -275,7 +275,7 @@ MENUCW:
 
 MENUCCW:
 
-		$azimuth = `python azimuth.py`;
+		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
                 $azimuth = sprintf ("%d", $azimuth);
 
@@ -318,7 +318,7 @@ MENUCCW:
 CCW:
 
 
- 		$azimuth = `python azimuth.py`;
+ 		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
                 $azimuth = sprintf ("%d", $azimuth);
 
@@ -334,7 +334,7 @@ CCW:
 		
                 while(1)
                         {
-				$azimuth = `python azimuth.py`;
+				$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
 				$azimuth = $azimuth / 50.8;
 				$azimuth = sprintf ("%d", $azimuth);
                    		
@@ -374,7 +374,7 @@ CCW:
 
 CW:
 
- 		$azimuth = `python azimuth.py`;
+ 		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
                 $azimuth = sprintf ("%d", $azimuth);
                 
@@ -391,7 +391,7 @@ CW:
                         {
                                 
 
-				$azimuth = `python azimuth.py`;
+				$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                                 $azimuth = $azimuth / 50.8;
                                 $azimuth = sprintf ("%d", $azimuth);
 
