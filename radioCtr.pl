@@ -7,9 +7,6 @@ use warnings;
 #		Controll Flex Radio, Rotator, Ant switch		#
 #									#
 ############################# 2019 ######################################
-
-
-
 # RAspberry Pi GPIO Pins:
 # Up   		-> 0
 # OK   		-> 2
@@ -26,15 +23,11 @@ my $line2;
 my $line3;
 my $line4;
 
-
-
 my $file = "/home/pi/HamRadio/RadioCntrBox/temp.txt";
 my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
 my $azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
-
 my $initialDelay = 3;
 my $unixFinish = time + $initialDelay;
-
 
 # Resets pins in Raspberry Pi
 
@@ -45,12 +38,9 @@ my $unixFinish = time + $initialDelay;
 `gpio mode 2 in`;
 `gpio mode 3 in`;
 
-
 `gpio write 1 1`;
 `gpio write 4 1`;
 `gpio write 5 1`;
-
-
 
 # Reset temp.txt file  - current data
 
@@ -63,17 +53,12 @@ my @ip = split (/\n/,$ip);
 $ip = $ip[1];
 my $mac = $ip[2];
 
-
 $line1 = "";
 $line2 = "My IP: $ip";
 $line3 = "";
 $line4 = "OK?";
 
-
 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
-
-
 
 while(1)
 
@@ -156,9 +141,7 @@ MENU:
 				$buttonUp = `gpio read 0`;
 				$buttonOk = `gpio read 2`;
 				$buttonDown = `gpio read 3`;
-				
-				print "up: $buttonUp, ok: $buttonOk, down: $buttonDown\n";
-
+			
 
 				if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
 					{
@@ -208,31 +191,40 @@ FLEXONOFF:
                 		$line4 = "DOWN to  Exit";
 
                 		`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+		
+			while(1)
+				{
+                		 	
 
-                		sleep(1);
+					$buttonUp = `gpio read 0`;
+                                        $buttonOk = `gpio read 2`;
+                                        $buttonDown = `gpio read 3`;
 
-                		while(1)
-                        		{
-                                		$buttonUp = `gpio read 0`;
-                                		$buttonOk = `gpio read 2`;
-                                		$buttonDown = `gpio read 3`;
+					if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                        	{
 
-		                                if ($buttonOk == 1)
-                		                        {
-								writeFile(1,$azimuth);
-								`gpio write 5 0`;
-        		                                        goto MENU;
-                        		                }
+                                                	while(1)
+                                                        	{
+                                					$buttonUp = `gpio read 0`;
+                                					$buttonOk = `gpio read 2`;
+                                					$buttonDown = `gpio read 3`;
 
-                                		if ($buttonDown == 1)
-                                        		{
-                                                		goto MENU;
-                                        		}
-                        		}
+		                                			if ($buttonOk == 1)
+                		                        			{
+											writeFile(1,$azimuth);
+											`gpio write 5 0`;
+        		                                        			goto MENU;
+                        		                			}
+
+                                					if ($buttonDown == 1)
+                                        					{
+                                                					goto MENU;
+                                        					}
+                        					}
+						}
+
+				}
 			}
-
-
-
 
  		if ($flexONOFF == 1)
                         {
@@ -241,10 +233,7 @@ FLEXONOFF:
                                 $line2 = "Turn it OFF?";
                                 $line3 = "OK?";
                                 $line4 = "DOWN to  Exit";
-
                                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
-
-                                sleep(1);
 
                                 while(1)
                                         {
@@ -252,20 +241,29 @@ FLEXONOFF:
                                                 $buttonOk = `gpio read 2`;
                                                 $buttonDown = `gpio read 3`;
 
-                                                if ($buttonOk == 1)
-                                                        {
-								writeFile(0,$azimuth);
-								`gpio write 5 1`;
-                                                                goto MENU;
-                                                        }
+						  if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                	{
+                                                       		 while(1)
+                                                                	{
+                                                                        	$buttonUp = `gpio read 0`;
+                                                                        	$buttonOk = `gpio read 2`;
+                                                                        	$buttonDown = `gpio read 3`;
 
-                                                if ($buttonDown == 1)
-                                                        {
-                                                                goto MENU;
-                                                        }
-                                        }
-                        }
+                                                				if ($buttonOk == 1)
+                                                        				{
+												writeFile(0,$azimuth);
+												`gpio write 5 1`;
+                                                                				goto MENU;
+                                                        				}
 
+                                                				if ($buttonDown == 1)
+                                                        				{
+                                                                				goto MENU;
+                                                        				}
+                                        				}
+							}
+  		                      }
+			}
 
 
 
@@ -280,36 +278,34 @@ ROTATOR:
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
-                sleep(1);
-
                 while(1)
                         {
-                                $buttonUp = `gpio read 0`;
-                                $buttonOk = `gpio read 2`;
-                                $buttonDown = `gpio read 3`;
+				readButtons();
+  				if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                {
 
-                                if ($buttonUp == 1)
-                                        {
-
-						goto MENU;
-
-                                        }
-
-                                if ($buttonOk == 1)
-                                        {
-
-                                                goto MENUCW;
-                                        }
-
-                                if ($buttonDown == 1)
-                                        {
-                                                goto AUDIO;
-                                        }
-                        }
+                                                        while(1)
+                                                                {
+                                                                        readButtons();
 
 
+                                					if ($buttonUp == 1)
+                                        					{
+											goto MENU;
+                                        					}
 
+                                					if ($buttonOk == 1)
+                                        					{
+                                                					goto MENUCW;
+                                        					}
 
+                                					if ($buttonDown == 1)
+                                        					{
+                                                					goto AUDIO;
+                                        					}
+                        					}
+						}
+		}
 
 
 
@@ -324,29 +320,27 @@ MENUCW:
                 $line4 = "RETURN";
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
-		sleep(1);
-
+		
 		while(1)
 			{
+		 		readButtons();
+                       		if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                {
 
-                		$buttonUp = `gpio read 0`;
-                		$buttonOk = `gpio read 2`;
-                		$buttonDown = `gpio read 3`;
+							while(1)
+								{
+									readButtons();
 
-			
-                		if ($buttonOk == 1)
-                               	 	{
-	
-        	                     		goto CW;           
-
-	                                }
-
-				if ($buttonDown == 1)
-                                {
-                                        goto MENUCCW;
-							
-                                }
-
+					                		if ($buttonOk == 1)
+                               	 						{
+        	                     							goto CW;           
+	                                					}
+									if ($buttonDown == 1)
+                                						{
+                                        						goto MENUCCW;	
+                                						}
+								}
+						}
 			}
 
 MENUCCW:
@@ -361,33 +355,31 @@ MENUCCW:
                 $line4 = "RETURN";
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
-		sleep(1);
 		
-		while(1)
-			{                
-				$buttonUp = `gpio read 0`;
-                		$buttonOk = `gpio read 2`;
-                		$buttonDown = `gpio read 3`;
-
 		
-				if ($buttonUp == 1)
-                                	{
+		 while(1)
+                        {
+                                readButtons();
+                                if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                {
 
-                        	                goto MENUCW;
-                	                }
-
-
-		                if ($buttonOk == 1)
-                                	{
-
-                                        	goto CCW;
-
-                                	}
-
-                		if ($buttonDown == 1)
-                                	{
-                                        	goto RETURN;
-                                	}
+                                                        while(1)
+                                                                {
+                                                                        readButtons();		
+									if ($buttonUp == 1)
+                                						{
+                        	                					goto MENUCW;
+                	                					}	
+		                					if ($buttonOk == 1)
+                                						{
+                                        						goto CCW;
+                                						}
+                							if ($buttonDown == 1)
+                                						{
+                                        						goto RETURN;
+                                						}
+								}
+						}
 			}
                                
 
@@ -406,7 +398,7 @@ CCW:
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		`gpio write 1 0`;
-                sleep(1);
+                
 		
                 while(1)
                         {
@@ -414,37 +406,33 @@ CCW:
 				$azimuth = $azimuth / 50.8;
 				$azimuth = sprintf ("%d", $azimuth);
                    		
-
 				$line1= "Ant Azimuth: $azimuth";
                                 $line3 = "..";
                                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
-		
-			        $buttonUp = `gpio read 0`;
-                                $buttonOk = `gpio read 2`;
-                                $buttonDown = `gpio read 3`;
-
-
-                                if ($buttonUp == 1)
-                                        {
-
-                                                
-                                        }
-
-
-                                if ($buttonOk == 1)
-                                        {
-
-                                               `gpio write 1 1`;
- 						goto MENUCCW;
-
-                                        }
-
-                                if ($buttonDown == 1)
-                                        {
-                                                
-                                        }
-                        }
+ 				while(1)
+		                        {
+                		                readButtons();
+                                		if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                	{
+                                                        	while(1)
+                                                                	{
+                                                                        	readButtons();
+                                						if ($buttonUp == 1)
+                                        						{
+                                        						}
+                                						if ($buttonOk == 1)
+                                        						{
+                                               							`gpio write 1 1`;
+ 												goto MENUCCW;
+                                        						}
+                                						if ($buttonDown == 1)
+                                        						{        
+                                        						}
+                        						}
+							}
+					}
+			}
 
 
 
@@ -461,7 +449,7 @@ CW:
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
 		`gpio write 4 0`;
-                sleep(1);
+               
 
                 while(1)
                         {
@@ -515,35 +503,32 @@ AUDIO:
                 $line2 = "Rotator";
                 $line3 = "Audio Record <--";
                 $line4 = "Return";
-
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
-                sleep(1);
 
                 while(1)
                         {
-                                $buttonUp = `gpio read 0`;
-                                $buttonOk = `gpio read 2`;
-                                $buttonDown = `gpio read 3`;
+                                readButtons();
+                                if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                {
 
-                                if ($buttonUp == 1)
-                                        {
-
-                                                goto ROTATOR;
-
-                                        }
-
-                                if ($buttonOk == 1)
-                                        {
-
-                                                goto AUDIOMENU;
-                                        }
-
-                                if ($buttonDown == 1)
-                                        {
-                                                goto RETURN;
-                                        }
-                        }
+                                                        while(1)
+                                                                {
+                                                                        readButtons();
+                                					if ($buttonUp == 1)
+                                        					{
+                                                					goto ROTATOR;
+                                        					}
+                                					if ($buttonOk == 1)
+                                        					{
+                                                					goto AUDIOMENU;
+                                        					}
+                                					if ($buttonDown == 1)
+                                        					{
+                                                					goto RETURN;
+                                        					}
+                        					}
+						}
+			}
 
 
 
@@ -556,35 +541,31 @@ AUDIOMENU:
                 $line2 = "UP to go back";
                 $line3 = "OK to record";
                 $line4 = "DOWN to Return";
-
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
-                sleep(1);
 
                 while(1)
                         {
-                                $buttonUp = `gpio read 0`;
-                                $buttonOk = `gpio read 2`;
-                                $buttonDown = `gpio read 3`;
-
-                                if ($buttonUp == 1)
-                                        {
-
-                                                goto AUDIO;
-
-                                        }
-
-                                if ($buttonOk == 1)
-                                        {
-
-                                                goto RECORDING;
-                                        }
-
-                                if ($buttonDown == 1)
-                                        {
-                                                goto RETURN;
-                                        }
-                        }
+                                readButtons();
+                                if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+                                                {
+                                                        while(1)
+                                                                {
+                                                                        readButtons();
+                                					if ($buttonUp == 1)
+                                        					{
+                                                					goto AUDIO;
+                                        					}
+                                					if ($buttonOk == 1)
+                                        					{
+                                                					goto RECORDING;
+                                        					}
+                                					if ($buttonDown == 1)
+                                        					{
+                                                					goto RETURN;
+                                        					}
+                        					}
+						}
+			}
 
 
 
@@ -595,31 +576,18 @@ RECORDING:
                 $line2 = " ";
                 $line3 = "OK to stop";
                 $line4 = "";
-
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 		my $recFileName = fileName();
+
+		my $childPid = fork();
 		
+		if( $childPid == 0 )
+        		{
+                		print "Child PID:$childPid\n";
+				`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;		# Child process RECORDING
+        		}
 
-		my $pid = fork();
-
-		unless (defined($pid)) 
-			{
-  				die "Fork failed: $!";
-			}
-		unless ($pid) 
-			{
-  				# we're the child
-				`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;
-
-			}
-
-
-		my $arecordPID = `pidof`;
-
-
-                sleep(1);
-		
 		my $totalSec = 1;
 
                 while(1)
@@ -657,16 +625,14 @@ RECORDING:
                 				$line4 = "OK to stop";
 
                 				`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-
-
-						$buttonUp = `gpio read 0`;
-                                		$buttonOk = `gpio read 2`;
-                                		$buttonDown = `gpio read 3`;
+						readButtons();
 
                                 		if ($buttonOk == 1)
                                         		{
 
-                                        	        	`sudo kill $arecordPID`;
+                                        	        	$SIG{CHLD} = sub { wait };
+								print "Killing child $childPid\n";
+				                                `sudo kill $childPid`;
 								goto AUDIOMENU;
                               		          	}
 
@@ -817,3 +783,9 @@ sub fileName
                 return $fileName;
         }
 
+sub readButtons
+	{
+		$buttonUp = `gpio read 0`;
+                $buttonOk = `gpio read 2`;
+                $buttonDown = `gpio read 3`;
+	}
