@@ -1,19 +1,20 @@
+
 #!/usr/bin/perl
 use strict;
 use warnings;
 
-# Proper use of fork with proper termination of child process without zambie
+# Proper way to fork with proper termination of child process and no zambies
 
 my $childPid = fork();
 if( $childPid == 0 )
         {
+
                 while(1)
                         {
                                 print "This is CHILD $childPid\n";
                                 sleep(1);
                         }
         }
-
 
 
 while(1)
@@ -29,3 +30,4 @@ while(1)
                         }
 
         }
+
