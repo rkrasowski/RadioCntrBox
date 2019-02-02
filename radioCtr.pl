@@ -579,7 +579,7 @@ RECORDING:
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 		my $recFileName = fileName();
-
+		my $arecordPID;
 		my $childPid = fork();
 		
 		if( $childPid == 0 )
@@ -630,8 +630,22 @@ RECORDING:
                                 		if ($buttonOk == 1)
                                         		{
 
-                                        	        	$SIG{CHLD} = sub { wait };
-								print "Killing child $childPid\n";
+                                        	        	
+								$arecordPID = `pgrep -f arecord`;
+                                                                print "Total ArecordPID: $arecordPID\n";
+								
+		
+								my @arecordPID = split(/\n/,$arecordPID);
+							  	print "Killing child of radioCTR: $childPid\n";
+								
+								#`sudo kill -9 $arecordPID[0]`;
+								#print "PID $arecordPID[0] killed\n";
+
+								`sudo kill -9 $arecordPID[1]`;
+								print "Arecord $arecordPID[1] killed\n";
+
+								 print "Killing child $childPid\n";
+								 $SIG{CHLD} = sub { wait };								
 				                                `sudo kill $childPid`;
 								goto AUDIOMENU;
                               		          	}
