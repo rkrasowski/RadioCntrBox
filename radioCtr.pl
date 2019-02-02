@@ -157,28 +157,39 @@ MENU:
 				$buttonOk = `gpio read 2`;
 				$buttonDown = `gpio read 3`;
 				
-				if($buttonUp == 0 && $buttonOk == 0 && $buttonDown == 0)
+				print "up: $buttonUp, ok: $buttonOk, down: $buttonDown\n";
+
+
+				if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
 					{
 
-						if ($buttonUp == 1)
-							{
-				
-					
-							}
+						while(1)
+							{	
+							
+								$buttonUp = `gpio read 0`;
+				                                $buttonOk = `gpio read 2`;
+                                				$buttonDown = `gpio read 3`;
 
-						if ($buttonOk == 1)
-							{
+								if ($buttonUp == 1)
+									{
+										
+									
 					
-								goto FLEXONOFF;
-							}
+									}
 
-						if ($buttonDown == 1)
-							{
-								goto ROTATOR;
-							} 
+								if ($buttonOk == 1)
+									{
+					
+										goto FLEXONOFF;
+									}
+
+								if ($buttonDown == 1)
+									{
+										goto ROTATOR;
+									} 
+							}
 					}
 			}
-
 
 
 
