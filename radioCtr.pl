@@ -6,7 +6,7 @@ use warnings;
 #									#
 #		Controll Flex Radio, Rotator, Ant switch		#
 #									#
-#########################################################################
+############################# 2019 ######################################
 
 
 
@@ -32,7 +32,7 @@ my $file = "/home/pi/HamRadio/RadioCntrBox/temp.txt";
 my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
 my $azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
 
-my $initialDelay = 2;
+my $initialDelay = 3;
 my $unixFinish = time + $initialDelay;
 
 
@@ -50,8 +50,6 @@ my $unixFinish = time + $initialDelay;
 `gpio write 4 1`;
 `gpio write 5 1`;
 
-
-sleep(20);
 
 
 # Reset temp.txt file  - current data
@@ -75,6 +73,8 @@ $line4 = "OK?";
 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 
+
+
 while(1)
 
 	{
@@ -84,6 +84,7 @@ while(1)
 			{	
 				goto DATE;
 			}
+
 		my $currentUnix = time;
 		if ($currentUnix > $unixFinish)
 			{
@@ -95,14 +96,15 @@ while(1)
 DATE:
 
 
-while(1)
-	{
-
 		my $date = `date`;
 		my @date = split (/ /,$date);
 
-		my $time = "$date[4] $date[5]";
-             
+		my @hrMin = split (/:/,$date[4]);
+		my $hrMIn;
+		my $time = "$hrMin[0]:$hrMin[1] $date[5]";             
+
+
+
 		$date[6] = substr( $date[6],0,4);
 
 		$date = "$date[0] $date[1] $date[3] $date[6]";
@@ -113,14 +115,28 @@ while(1)
 		$line4 = "OK for Menu";
 
 		`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-		sleep(1);
 
-		$buttonOk = `gpio read 2`;
-		if ($buttonOk == 1)
-                        {
-                                goto MENU;
-                        }
-	}
+
+		my $clockTime = `date +%s`;
+		my $clockTimeStep = $clockTime + 60;
+
+	while(1)
+		{
+		
+			$clockTime = `date +%s`;	
+			if ($clockTime >= $clockTimeStep)
+				{
+					goto DATE;
+				}
+
+
+
+			$buttonOk = `gpio read 2`;
+			if ($buttonOk == 1)
+                	        {
+                        	        goto MENU;
+                        	}
+		}
 		
 
 
@@ -129,36 +145,42 @@ MENU:
                 $line1= "Functions:";
                 $line2 = "Radio ON/OFF <--";
                 $line3 = "Rotator";
-                $line4 = "Antenna Switch";
+                $line4 = "Audio Recording";
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
-		sleep(1);
+		
 		
 		while(1)
 			{
 				$buttonUp = `gpio read 0`;
 				$buttonOk = `gpio read 2`;
 				$buttonDown = `gpio read 3`;
-
-				if ($buttonUp == 1)
-					{
 				
-						
-
-					}
-
-				if ($buttonOk == 1)
+				if($buttonUp == 0 && $buttonOk == 0 && $buttonDown == 0)
 					{
+
+						if ($buttonUp == 1)
+							{
+				
 					
-						goto FLEXONOFF;
-					}
+							}
 
-				if ($buttonDown == 1)
-					{
-						goto MENUCW;
-					} 
+						if ($buttonOk == 1)
+							{
+					
+								goto FLEXONOFF;
+							}
+
+						if ($buttonDown == 1)
+							{
+								goto ROTATOR;
+							} 
+					}
 			}
+
+
+
 
 
 
@@ -232,6 +254,49 @@ FLEXONOFF:
                                                         }
                                         }
                         }
+
+
+
+
+
+ROTATOR:
+
+
+		$line1= "Functions:";
+                $line2 = "Radio ON/OFF ";
+                $line3 = "Rotator <--";
+                $line4 = "Audio Recording";
+
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+                sleep(1);
+
+                while(1)
+                        {
+                                $buttonUp = `gpio read 0`;
+                                $buttonOk = `gpio read 2`;
+                                $buttonDown = `gpio read 3`;
+
+                                if ($buttonUp == 1)
+                                        {
+
+						goto MENU;
+
+                                        }
+
+                                if ($buttonOk == 1)
+                                        {
+
+                                                goto MENUCW;
+                                        }
+
+                                if ($buttonDown == 1)
+                                        {
+                                                goto AUDIO;
+                                        }
+                        }
+
+
 
 
 
@@ -433,6 +498,181 @@ CW:
 
 
 
+AUDIO:
+
+                $line1= "Functions:";
+                $line2 = "Rotator";
+                $line3 = "Audio Record <--";
+                $line4 = "Return";
+
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+                sleep(1);
+
+                while(1)
+                        {
+                                $buttonUp = `gpio read 0`;
+                                $buttonOk = `gpio read 2`;
+                                $buttonDown = `gpio read 3`;
+
+                                if ($buttonUp == 1)
+                                        {
+
+                                                goto ROTATOR;
+
+                                        }
+
+                                if ($buttonOk == 1)
+                                        {
+
+                                                goto AUDIOMENU;
+                                        }
+
+                                if ($buttonDown == 1)
+                                        {
+                                                goto RETURN;
+                                        }
+                        }
+
+
+
+
+
+AUDIOMENU:
+
+
+		$line1= "Audio Recording:";
+                $line2 = "UP to go back";
+                $line3 = "OK to record";
+                $line4 = "DOWN to Return";
+
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+                sleep(1);
+
+                while(1)
+                        {
+                                $buttonUp = `gpio read 0`;
+                                $buttonOk = `gpio read 2`;
+                                $buttonDown = `gpio read 3`;
+
+                                if ($buttonUp == 1)
+                                        {
+
+                                                goto AUDIO;
+
+                                        }
+
+                                if ($buttonOk == 1)
+                                        {
+
+                                                goto RECORDING;
+                                        }
+
+                                if ($buttonDown == 1)
+                                        {
+                                                goto RETURN;
+                                        }
+                        }
+
+
+
+
+
+RECORDING:
+		$line1= "Recording";
+                $line2 = " ";
+                $line3 = "OK to stop";
+                $line4 = "";
+
+                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+		my $recFileName = fileName();
+		
+
+		my $pid = fork();
+
+		unless (defined($pid)) 
+			{
+  				die "Fork failed: $!";
+			}
+		unless ($pid) 
+			{
+  				# we're the child
+				`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;
+
+			}
+
+
+		my $arecordPID = `pidof`;
+
+
+                sleep(1);
+		
+		my $totalSec = 1;
+
+                while(1)
+                        {
+                              
+
+			
+					{
+
+						$totalSec = $totalSec + 1;
+						my $min;
+						my $hrs;
+						my $sec;
+
+						$min = $totalSec / 60;
+						$min =~ s/\.\d+$//;
+
+						if ($totalSec <60)
+        						{
+                						$sec = $totalSec;
+        						}
+						else
+        						{
+
+                						$sec = $totalSec -($min * 60)
+        						}
+
+						my $displayRecTime = "$min min $sec sec";
+
+	  			
+						sleep(1);
+						$line1= "RECORDING:";
+                				$line2 = "Time: ";
+                				$line3 = "$displayRecTime";
+                				$line4 = "OK to stop";
+
+                				`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+
+
+						$buttonUp = `gpio read 0`;
+                                		$buttonOk = `gpio read 2`;
+                                		$buttonDown = `gpio read 3`;
+
+                                		if ($buttonOk == 1)
+                                        		{
+
+                                        	        	`sudo kill $arecordPID`;
+								goto AUDIOMENU;
+                              		          	}
+
+                              
+					}
+		
+                        }
+
+
+
+
+
+
+
+
+
+
 
 MENUANTSWITCH:
 
@@ -552,5 +792,17 @@ sub writeFile
         }
 
 
+sub fileName
+        {
+                my $date = `date`;
+                my @date = split (/ /,$date);
+                chomp$date[6];
 
+                my @HrMin = split(/:/,$date[4]);
+                my $HrMin;
+
+
+                my $fileName = "$date[3]-$date[1]-$date[6]_$HrMin[0]_$HrMin[1]_$HrMin[2]";
+                return $fileName;
+        }
 
