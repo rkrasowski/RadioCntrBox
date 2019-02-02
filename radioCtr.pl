@@ -22,6 +22,9 @@ my $line1;
 my $line2;
 my $line3;
 my $line4;
+my $CCWlimit = 3;
+my $CWlimit = 359;
+
 
 my $file = "/home/pi/HamRadio/RadioCntrBox/temp.txt";
 my $flexONOFF = 0;			# Indicate Flex On->1 Off->0
@@ -309,7 +312,7 @@ ROTATOR:
 
 
 
-MENUCW:
+MENUCCW:
 		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
                 $azimuth = sprintf ("%d", $azimuth);
@@ -333,17 +336,17 @@ MENUCW:
 
 					                		if ($buttonOk == 1)
                                	 						{
-        	                     							goto CW;           
+        	                     							goto CCW;           
 	                                					}
 									if ($buttonDown == 1)
                                 						{
-                                        						goto MENUCCW;	
+                                        						goto MENUCW;	
                                 						}
 								}
 						}
 			}
 
-MENUCCW:
+MENUCW:
 
 		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
@@ -368,11 +371,11 @@ MENUCCW:
                                                                         readButtons();		
 									if ($buttonUp == 1)
                                 						{
-                        	                					goto MENUCW;
+                        	                					goto MENUCCW;
                 	                					}	
 		                					if ($buttonOk == 1)
                                 						{
-                                        						goto CCW;
+                                        						goto CW;
                                 						}
                 							if ($buttonDown == 1)
                                 						{
@@ -383,7 +386,7 @@ MENUCCW:
 			}
                                
 
-CCW:
+CW:
 
 
  		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
@@ -392,51 +395,49 @@ CCW:
 
 
 		$line1= "Ant Azimuth: $azimuth";
-                $line2 = "Turning CCW";
+                $line2 = "Turning CW";
                 $line3 = ".";
                 $line4 = "OK to STOP?";
 
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
-		`gpio write 1 0`;
-                
+		`gpio write 1 0`;                
 		
                 while(1)
                         {
-				$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
-				$azimuth = $azimuth / 50.8;
-				$azimuth = sprintf ("%d", $azimuth);
+				readButtons();
+                                if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+					{
+						while(1)
+							{
+								$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
+								$azimuth = $azimuth / 50.8;
+								$azimuth = sprintf ("%d", $azimuth);
                    		
-				$line1= "Ant Azimuth: $azimuth";
-                                $line3 = "..";
-                                `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+								$line1= "Ant Azimuth: $azimuth";
+                                				$line3 = "..";
+                                				`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+				
+								if ($azimuth >= $CWlimit)		# SAfety limit for turning azimuth)
+									{
+										`gpio write 1 1`;						
+										goto MENUCCW;
+									}
 
- 				while(1)
-		                        {
-                		                readButtons();
-                                		if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
-                                                	{
-                                                        	while(1)
-                                                                	{
-                                                                        	readButtons();
-                                						if ($buttonUp == 1)
-                                        						{
-                                        						}
-                                						if ($buttonOk == 1)
-                                        						{
-                                               							`gpio write 1 1`;
- 												goto MENUCCW;
-                                        						}
-                                						if ($buttonDown == 1)
-                                        						{        
-                                        						}
-                        						}
-							}
+                		                		readButtons();                         
+                                                         
+                                				if ($buttonOk == 1)
+                                        				{
+                                               					`gpio write 1 1`;
+ 										goto MENUCW;
+                                        				}
+                        				}
 					}
 			}
+			
 
 
 
-CW:
+CCW:
 
  		$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
                 $azimuth = $azimuth / 50.8;
@@ -453,45 +454,35 @@ CW:
 
                 while(1)
                         {
-                                
+                                readButtons();
+                                if($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
+					{
+						while(1)
+							{
+								$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
+                                				$azimuth = $azimuth / 50.8;
+                                				$azimuth = sprintf ("%d", $azimuth);
 
-				$azimuth = `python /home/pi/HamRadio/RadioCntrBox/azimuth.py`;
-                                $azimuth = $azimuth / 50.8;
-                                $azimuth = sprintf ("%d", $azimuth);
+				                                $line1= "Ant Azimut: $azimuth";
+								$line3 = "..";
+								`python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
+								
+								readButtons();
+								if ($azimuth <= $CCWlimit)
+                                        				{
+                                                				`gpio write 4 1`;
+										goto MENUCW;
+                                        				}
 
-
-                                $line1= "Ant Azimut: $azimuth";
-
-				$line3 = "..";
-				`python /home/pi/HamRadio/RadioCntrBox/lcd.py  "$line1" "$line2" "$line3" "$line4"`;
-
-
-
-				$buttonUp = `gpio read 0`;
-                                $buttonOk = `gpio read 2`;
-                                $buttonDown = `gpio read 3`;
-
-
-                                if ($buttonUp == 1)
-                                        {
-
-
-                                        }
-
-
-                                if ($buttonOk == 1)
-                                        {
-
-                                                `gpio write 4 1`;
-						goto MENUCW;
-
-                                        }
-
-                                if ($buttonDown == 1)
-                                        {
-
-                                        }
+				                                if ($buttonOk == 1)
+                                				        {
+                                                				`gpio write 4 1`;
+										goto MENUCCW;
+                                        				}
+							}
+					}
 			}
+
 
 
 
