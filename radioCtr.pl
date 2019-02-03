@@ -563,10 +563,10 @@ AUDIOMENU:
 
 
 RECORDING:
-		$line1= "Recording";
-                $line2 = " ";
-                $line3 = "OK to stop";
-                $line4 = "";
+		$line1= "RECORDING:";
+                $line2 = "Time:";
+                $line3 = "0 min 0 sec";
+                $line4 = "Ok to stop";
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
 		 while(1)
@@ -582,11 +582,10 @@ RECORDING:
 
 							if( $childPid == 0 )
         							{
-                							print "Child PID:$childPid\n";
 									`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;		# Child process RECORDING
         							}
 
-							my $totalSec = 1;
+							my $totalSec = 0;
 
                 					while(1)
                         					{
@@ -594,8 +593,6 @@ RECORDING:
 									my $min;
 									my $hrs;
 									my $sec;
-									
-									print "Before display\n";
 
 									$min = $totalSec / 60;
 									$min =~ s/\.\d+$//;
@@ -619,24 +616,17 @@ RECORDING:
 
                 							`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 									
-									print "After display\n";
-
+							
 									readButtons();
                                 					if ($buttonOk == 1)
                                         					{
 											$arecordPID = `pgrep -f arecord`;
-                                                                			print "Total ArecordPID: $arecordPID\n";
-								
+                                                                
 											my @arecordPID = split(/\n/,$arecordPID);
-							  				print "Killing child of radioCTR: $childPid\n";
-								
-											#`sudo kill -9 $arecordPID[0]`;
-											#print "PID $arecordPID[0] killed\n";
 
 											`sudo kill $arecordPID[1]`;
-											print "Arecord $arecordPID[1] killed\n";
+										
 
-								 			print "Killing child $childPid\n";
 								 			#$SIG{CHLD} = sub { wait };								
 				                                			`sudo kill $childPid`;
 											goto AUDIOMENU;
