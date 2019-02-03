@@ -576,6 +576,7 @@ RECORDING:
 					{
 					while(1)
 						{
+							local $SIG{CHLD} = "IGNORE";
 							my $recFileName = fileName();
 							my $arecordPID;
 							my $childPid = fork();
