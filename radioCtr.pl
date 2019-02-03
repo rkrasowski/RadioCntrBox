@@ -569,80 +569,81 @@ RECORDING:
                 $line4 = "";
                 `python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
 
-		my $recFileName = fileName();
-		my $arecordPID;
-		my $childPid = fork();
-		
-		if( $childPid == 0 )
-        		{
-                		print "Child PID:$childPid\n";
-				`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;		# Child process RECORDING
-        		}
-
-		my $totalSec = 1;
-
-                while(1)
+		 while(1)
                         {
-                              
-
-			
+                                readButtons();
+                                if ($buttonUp == 0 and $buttonOk == 0 and $buttonDown == 0)
 					{
+					while(1)
+						{
+							my $recFileName = fileName();
+							my $arecordPID;
+							my $childPid = fork();
 
-						$totalSec = $totalSec + 1;
-						my $min;
-						my $hrs;
-						my $sec;
+							if( $childPid == 0 )
+        							{
+                							print "Child PID:$childPid\n";
+									`sudo arecord -D hw:1,0 -f cd /var/www/html/recordings/$recFileName.wav -c 1`;		# Child process RECORDING
+        							}
 
-						$min = $totalSec / 60;
-						$min =~ s/\.\d+$//;
+							my $totalSec = 1;
 
-						if ($totalSec <60)
-        						{
-                						$sec = $totalSec;
-        						}
-						else
-        						{
+                					while(1)
+                        					{
+									$totalSec = $totalSec + 1;
+									my $min;
+									my $hrs;
+									my $sec;
+									
+									print "Before display\n";
 
-                						$sec = $totalSec -($min * 60)
-        						}
+									$min = $totalSec / 60;
+									$min =~ s/\.\d+$//;
 
-						my $displayRecTime = "$min min $sec sec";
+									if ($totalSec <60)
+        									{
+                									$sec = $totalSec;
+        									}
+									else
+        									{
+                									$sec = $totalSec -($min * 60)
+        									}
 
-	  			
-						sleep(1);
-						$line1= "RECORDING:";
-                				$line2 = "Time: ";
-                				$line3 = "$displayRecTime";
-                				$line4 = "OK to stop";
+									my $displayRecTime = "$min min $sec sec";
 
-                				`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
-						readButtons();
+									sleep(1);
+									$line1= "RECORDING:";
+                							$line2 = "Time: ";
+                							$line3 = "$displayRecTime";
+                							$line4 = "OK to stop";
 
-                                		if ($buttonOk == 1)
-                                        		{
+                							`python /home/pi/HamRadio/RadioCntrBox/lcd.py "$line1" "$line2" "$line3" "$line4"`;
+									
+									print "After display\n";
 
-                                        	        	
-								$arecordPID = `pgrep -f arecord`;
-                                                                print "Total ArecordPID: $arecordPID\n";
+									readButtons();
+                                					if ($buttonOk == 1)
+                                        					{
+											$arecordPID = `pgrep -f arecord`;
+                                                                			print "Total ArecordPID: $arecordPID\n";
 								
-		
-								my @arecordPID = split(/\n/,$arecordPID);
-							  	print "Killing child of radioCTR: $childPid\n";
+											my @arecordPID = split(/\n/,$arecordPID);
+							  				print "Killing child of radioCTR: $childPid\n";
 								
-								#`sudo kill -9 $arecordPID[0]`;
-								#print "PID $arecordPID[0] killed\n";
+											#`sudo kill -9 $arecordPID[0]`;
+											#print "PID $arecordPID[0] killed\n";
 
-								`sudo kill -9 $arecordPID[1]`;
-								print "Arecord $arecordPID[1] killed\n";
+											`sudo kill $arecordPID[1]`;
+											print "Arecord $arecordPID[1] killed\n";
 
-								 print "Killing child $childPid\n";
-								 $SIG{CHLD} = sub { wait };								
-				                                `sudo kill $childPid`;
-								goto AUDIOMENU;
-                              		          	}
-
+								 			print "Killing child $childPid\n";
+								 			#$SIG{CHLD} = sub { wait };								
+				                                			`sudo kill $childPid`;
+											goto AUDIOMENU;
+                              		          				}
+								}
                               
-					}
+					}	}
 		
                         }
 
